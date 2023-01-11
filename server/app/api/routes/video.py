@@ -38,4 +38,3 @@ async def create_stream(
 
 
     return VideoStreamResponse(video_stream=result)
-    # return {"Something": "something"}
