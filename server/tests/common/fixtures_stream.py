@@ -41,7 +41,7 @@ def stream_request(random_generator: Random, internet: Internet) -> VideoStreamR
     stream_model: VideoStream = VideoStream(
         streamId=random_generator.randstr(),
         status=random.choice(stream_statuses),
-        playlistStatus=random.choice(stream_statuses),
+        playListStatus=random.choice(stream_statuses),
         type=random.choice(stream_types),
         publishType=random.choice(publishType),
         name=random_generator.randstr(),
@@ -58,7 +58,7 @@ def stream_request(random_generator: Random, internet: Internet) -> VideoStreamR
         username=random_generator.randstr(),
         password=random_generator.randstr(),
         quality=random.choice(stream_qualities),
-        originAddress=internet.ip_v4(),
+        originAdress=internet.ip_v4(),
         mp4Enabled=random.choice(int_options),
         webMEnabled=random.choice(int_options),
         expireDurationMS=random.randint(0, 600),

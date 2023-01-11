@@ -20,7 +20,7 @@ class VideoStream(BaseModel):
     name: str
     publishType: str
     type: str
-    playlistStatus: str
+    playListStatus: str
     date: Optional[int]
     plannedStartDate: int
     plannedEndDate: int
@@ -37,7 +37,7 @@ class VideoStream(BaseModel):
     quality: str
     speed: float
     streamUrl: str
-    originAddress: str
+    originAdress: str
     mp4Enabled: int
     webMEnabled: int
     expireDurationMS: int

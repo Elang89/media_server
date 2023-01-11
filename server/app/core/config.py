@@ -19,8 +19,12 @@ VERSION: str = config("VERSION", default="1.0.0")
 DEBUG: bool = config("DEBUG", cast=bool, default=False)
 PROJECT_NAME: str = config("PROJECT_NAME", default="Media Server API")
 
-# Database
+# Ant Server
+ANT_HOST: str = config("ANT_HOST", default="localhost")
+ANT_PORT: str = config("ANT_PORT", default="5080")
+ANT_REST_PATH: str = config("ANT_REST_PATH", default="WebRTCApp/rest/v2")
 
+# Database
 DB_USER: str = config("DB_USER", default="root")
 DB_PASSWORD: str = config("DB_PASSWORD", default="password")
 DB_HOST: str = config("DB_HOST", default="localhost")
