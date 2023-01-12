@@ -1,11 +1,10 @@
 fastapi
 loguru
 docker
-motor
 uvicorn
+pymongo
 python-dotenv
 black
-motor
 httpx
 flake8
 autoflake
