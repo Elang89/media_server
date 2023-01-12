@@ -15,7 +15,8 @@ router = APIRouter()
     name="stream:create-stream",
     tags=[TAG_VIDEO],
     response_class=JSONResponse,
-    response_model=VideoStreamResponse
+    response_model=VideoStreamResponse,
+    status_code=status.HTTP_201_CREATED
 )
 async def create_stream(
         stream_request: VideoStreamRequest,

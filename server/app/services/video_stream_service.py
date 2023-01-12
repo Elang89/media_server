@@ -15,18 +15,19 @@ class VideoStreamService:
 
     async def create_stream(self, stream: VideoStream) -> Union[VideoStream, None, HTTPError]:
         try: 
-            response = await self._client.post("/broadcasts/create", json=stream.dict())
+            response = await self._client.post("broadcasts/create", json=stream.dict())
 
             if response.status_code == status.HTTP_400_BAD_REQUEST and response.headers["content-type"] == "application/json":
                 return None
 
+
             return VideoStream(**response.json())
 
-        except HTTPStatusError:
-            logger.error(e)
+        except HTTPStatusError as e:
+            logger.error(e.response.status_code)
             return e
         except TimeoutException as e:
-            logger.error(e)
+            logger.error(e.request.url)
             return e
 
     

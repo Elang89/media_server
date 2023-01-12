@@ -10,18 +10,73 @@ from fastapi import FastAPI
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
 
+ANT_DOCKER_IMAGE: str = "antmediaserver"
+ANT_DOCKER_CONTAINER_NAME: str = "test-antmedia"
+MONGO_DOCKER_IMAGE: str = "mongo"
+MONGO_DOCKER_CONTAINER_NAME: str = "test-mongo"
 
-MONGO_DOCKER_IMAGE = "mongo:4.2.23"
-MONGO_DOCKER_CONTAINER_NAME = "test-mongo"
-
-USE_LOCAL_DB = getenv("USE_LOCAL_DB_FOR_TEST", False)
+USE_LOCAL_ANT: bool = getenv("USE_LOCAL_ANT_FOR_TEST", False)
 
 pytest_plugins = ["tests.common.fixtures_stream"]
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def docker() -> libdocker.APIClient:
-    with libdocker.APICLient(version="auto") as client:
+    with libdocker.APIClient(version="auto") as client:
         yield client
+
+@pytest.fixture(scope="session", autouse=True)
+def mongo_server(docker: libdocker.APIClient) -> None: 
+    if USE_LOCAL_ANT is not False: 
+        host_config = docker.create_host_config(port_bindings = {27017:27017})
+        container = docker.create_container(
+            image=MONGO_DOCKER_IMAGE,
+            name=MONGO_DOCKER_CONTAINER_NAME,
+            detach=True,
+            ports=[27017],
+            host_config=host_config
+        )
+
+        docker.start(container=container["Id"])
+        docker.start(container=container["Id"])
+        inspection = docker.inspect_container(container["Id"])
+        host = inspection["NetworkSettings"]["IPAddress"]
+        
+        environ["ANT_HOST"] = host
+        environ["ANT_PORT"] = "5090"
+
+        yield container
+        docker.kill(container["Id"])
+        docker.remove_container(container["Id"])
+    else:
+        yield
+        return
+
+@pytest.fixture(scope="session", autouse=True)
+def ant_server(docker: libdocker.APIClient) -> None:
+    if USE_LOCAL_ANT is not False:
+        host_config = docker.create_host_config(port_bindings = {5090:5090}) 
+        container = docker.create_container(
+            image=ANT_DOCKER_IMAGE,
+            name=ANT_DOCKER_CONTAINER_NAME,
+            detach=True,
+            ports=[5090],
+            host_config=host_config
+        )
+
+        docker.start(container=container["Id"])
+        inspection = docker.inspect_container(container["Id"])
+        host = inspection["NetworkSettings"]["IPAddress"]
+
+        environ["ANT_HOST"] = host
+        environ["ANT_PORT"] = "5090"
+
+
+        yield container
+        docker.kill(container["Id"])
+        docker.remove_container(container["Id"])
+    else: 
+        yield
+        return
 
 
 @pytest.fixture

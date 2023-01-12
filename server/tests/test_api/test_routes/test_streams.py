@@ -1,3 +1,4 @@
+from pprint import pprint
 import pytest
 
 from fastapi import FastAPI
@@ -21,7 +22,7 @@ async def test_create_stream(
         json=stream_request.dict() 
     )
 
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_201_CREATED
 
     stream_response = VideoStreamResponse(**response.json())
 
@@ -30,9 +31,30 @@ async def test_create_stream(
     
 async def test_create_stream_unprocessable(app: FastAPI, client: AsyncClient) -> None:
 
+    pprint(app.url_path_for(POST_STREAM_ROUTE))
+
     response = await client.post(
-        app.url_path_for(POST_STREAM_ROUTE),
+    app.url_path_for(POST_STREAM_ROUTE),
         json={"bad_request": "bad"}
     )
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+async def test_create_duplicate_stream(
+    app: FastAPI, 
+    client: AsyncClient,
+    stream_request: VideoStreamRequest
+) -> None: 
+        await client.post(
+            app.url_path_for(POST_STREAM_ROUTE),
+            json=stream_request.dict() 
+        )
+
+        response = await client.post(
+            app.url_path_for(POST_STREAM_ROUTE),
+            json=stream_request.dict() 
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
