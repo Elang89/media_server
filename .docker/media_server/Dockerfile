@@ -6,12 +6,19 @@ FROM ubuntu:20.04
 
 ARG AntMediaServer
 
+ARG MongoDBServer
+ARG MongoDBUsername
+ARG MongoDBPassword
+ENV MongoDBConn="mongodb://${MongoDBUsername}:${MongoDBPassword}@${MongoDBServer}:27017"
+RUN echo $MongoDBConn
+
 ARG BranchName=master
 
 #Running update and install makes the builder not to use cache which resolves some updates
 RUN apt-get update && apt-get install -y curl wget iproute2 cron logrotate
 
 ADD ./${AntMediaServer} /home
+
 
 RUN cd home \
     && pwd \
@@ -22,6 +29,12 @@ RUN cd home \
     && pwd \
     && ./install_ant-media-server.sh -i ${AntMediaServer} -s false
 
+COPY red5.properties /usr/local/antmedia/conf/
+COPY web.xml /usr/local/antmedia/webapps/WebRTCApp/WEB-INF/
+
+# RUN /bin/bash -c 'if [ ! -z "${MongoDBServer}" ]; then \
+#                     /usr/local/antmedia/change_server_mode.sh cluster ${MongoDBServer} ${MongoDBUsername} ${MongoDBPassword}; \
+#                  fi'
 
 # Options
 # -g: Use global(Public) IP in network communication. Its value can be true or false. Default value is false.

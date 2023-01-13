@@ -1,13 +1,19 @@
 # Backend Software Engineer Coding Challenge
 
+# NEED ONE ACTOR PER STREAM
+
 ----
 
 # Table of contents
 
-1. [Introduction](#introduction)
-2. [Challenge Description](#challenge-description)
-3. [Submission Requirements](#submission-requirements)
-4. [Review](#review)
+- [Backend Software Engineer Coding Challenge](#backend-software-engineer-coding-challenge)
+- [NEED ONE ACTOR PER STREAM](#need-one-actor-per-stream)
+- [Table of contents](#table-of-contents)
+- [Introduction](#introduction)
+- [Challenge Description](#challenge-description)
+- [Submission Requirements](#submission-requirements)
+- [Review](#review)
+  - [Resources](#resources)
 
 ----
 

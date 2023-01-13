@@ -17,7 +17,6 @@ docker network create \
 
 # Kafka
 
-
 ```bash
 cd .docker/kafka
 docker build -t kafka .
@@ -61,7 +60,6 @@ docker run -d --name zookeeper \
 
 # Media Server
 
-
 ```bash
 cd .docker/media_server
 export ZIP_FILE=ant-media-server-community-2.5.1.zip
@@ -85,19 +83,36 @@ test-001.m3u8  test-001000000000.ts  test-001000000001.ts  test-001000000002.ts 
 
 ----
 
-
 # Gstreamer
-
 
 ```bash
 docker build -t gstreamer .
-docker run -d --name gstreamer --net=cloud_manager --ip=172.23.0.3 -w /start gstreamer
+docker run -d --name gstreamer --net=cloud_manager --ip=172.23.0.3 -w /start gstreamer bash -c "sleep infinity" 
 docker exec -it gstreamer bash
 # send a stream to Ant Media Server
 $ export VID=/start/sample.mp4
 $ export AMS_URL='rtmp://172.23.0.2:1935/WebRTCApp/test-001'
 $ gst-launch-1.0 filesrc location=$VID ! rtmpsink location=$AMS_URL
+$ gst-launch-1.0 filesrc location=$VID ! qtdemux ! avdec_h264 ! x264enc ! flvmux ! rtmpsink location=$AMS_URL
+$ gst-launch-1.0 videotestsrc ! videoconvert ! x264enc ! flvmux ! rtmpsink location=$AMS_URL
+$ gst-launch-1.0 videotestsrc ! videoconvert ! x264enc ! flvmux ! rtmpsink location=$AMS_URL
+$ gst-discoverer-1.0 $VID
+$ ffprobe $VID
+
+
 ```
 
 - view streams in AMS: http://172.23.0.2:5080/#/applications/WebRTCApp
 - go into AMS docker container and view the files saved: `ls /usr/local/antmedia/webapps/WebRTCApp/streams`
+
+
+# Mongo
+```bash
+docker run -d --name mongodb \
+    --net=cloud_manager \
+    --ip="172.23.0.4" \
+    -p "27017:27017" \
+    -e MONGO_INITDB_ROOT_USERNAME=root \
+    -e MONGO_INITDB_ROOT_PASSWORD=admin \
+    mongo:latest
+```
