@@ -1,6 +1,7 @@
 pulsar
+bson
 pydantic
-aioboto3
+boto3
 ffprobe-python
 watchdog
 loguru
