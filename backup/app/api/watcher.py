@@ -10,15 +10,21 @@ from app.aws.services.s3_service import S3Service
 from app.db.repositories.backup_repository import BackupRepository
 
 from app.models.backup import Backup
-from app.utils.sync import run_in_thread
 
 class Watcher(object):
 
-    def __init__(self, path: str, backup_repo: BackupRepository, s3_service: S3Service):
+    def __init__(
+        self, path: str, 
+        backup_repo: BackupRepository, 
+        s3_service: S3Service, 
+        actor_wait_time: float
+    ) -> None:
+        
         self._observer: Observer = Observer()
         self._path = path
         self._backup_repo = backup_repo
         self._s3_service = s3_service
+        self._actor_wait_time = actor_wait_time
 
     @property
     def path(self) -> str:
@@ -32,7 +38,7 @@ class Watcher(object):
 
         try:
             while True:
-                time.sleep(2.5)
+                time.sleep(self._actor_wait_time)
         except:
             self._observer.stop()
             logger.error("Error")
