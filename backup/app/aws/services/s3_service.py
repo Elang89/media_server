@@ -9,12 +9,9 @@ class S3Service(object):
     def __init__(self, client: ServiceResource):
         self._client = client
 
-    def upload(self, file_name: str) -> None:
+    def upload(self, file_path: str, folder: str, file_name: str) -> None:
         try:
-            folder = file_name.split("/")[-2]
-
-            object_file = os.path.basename(file_name)
-            self._client.upload_file(file_name, "amsvideo001", f"{folder}/{object_file}")
+            self._client.upload_file(file_path, "amsvideo001", f"{folder}/{file_name}")
         except Exception as e: 
             logger.error(e)
 

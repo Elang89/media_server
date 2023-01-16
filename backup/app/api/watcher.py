@@ -1,3 +1,4 @@
+import os
 import time
 
 from loguru import logger
@@ -54,11 +55,14 @@ class Handler(FileSystemEventHandler):
 
         metadata = FFProbe(file_path)
         metadata = metadata.metadata
+        folder = file_path.split("/")[-2]
+
+        object_file = os.path.basename(file_path)
 
         backup = Backup(
             stream_id="stream", 
             file_path=file_path,
-            external_filepath=f"s3://amsvideo001/{file_path}",
+            external_filepath=f"s3://amsvideo001/{folder}/{object_file}",
             major_brand=metadata["major_brand"],
             minor_version=metadata["minor_version"],
             compatible_brands=metadata["compatible_brands"],
@@ -68,7 +72,6 @@ class Handler(FileSystemEventHandler):
             bitrate=metadata["bitrate"]
         )
         
-        self._s3_service.upload(file_path)
+        self._s3_service.upload(file_path, folder, object_file)
         self._backup_repo.insert_one(backup)
-        # await run_in_thread(collection.insert_one, backup.dict())
 
