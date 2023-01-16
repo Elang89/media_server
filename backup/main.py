@@ -24,17 +24,16 @@ def main() -> None:
 
 
     repo = BackupRepository(coll)
-    s3 = boto3.resource(
+    s3 = boto3.client(
         service_name="s3",
         region_name="us-east-2",
         aws_access_key_id=key_id,
         aws_secret_access_key=key
     )
+    s3_service = S3Service(s3)
 
-    for bucket in s3.buckets.all():
-        print(bucket.name)
-        
-    w = Watcher("../video/test001", database)
+
+    w = Watcher("../video/test001", repo, s3_service)
     w.run()
 
 if __name__ == "__main__":

@@ -9,9 +9,9 @@ class BackupRepository():
     def __init__(self, collection: Collection):
         self._collection = collection
 
-    async def insert_one(self, backup: Backup) -> Backup:
-        try:
-            await run_in_thread(self._collection.insert_one, backup.dict())
+    def insert_one(self, backup: Backup) -> Backup:
+        try: 
+            self._collection.insert_one(backup.dict())
             return Backup
         except:
             logger.error("Error")

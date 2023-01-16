@@ -1,20 +1,20 @@
 import os
 
 from loguru import logger
-from app.utils.sync import run_in_thread
 
+from boto3.resources.base import ServiceResource
 
 class S3Service(object):
 
-    def __init__(self, client, bucket):
+    def __init__(self, client: ServiceResource):
         self._client = client
-        self._bucket = bucket
 
-    async def upload(self, file_name: str) -> None:
+    def upload(self, file_name: str) -> None:
         try:
+            folder = file_name.split("/")[-2]
+
             object_file = os.path.basename(file_name)
-            await run_in_thread(self._client.upload_file , file_name, self._bucket, object_file)
- 
-        except: 
-            logger.error("S3 Error")
+            self._client.upload_file(file_name, "amsvideo001", f"{folder}/{object_file}")
+        except Exception as e: 
+            logger.error(e)
 
