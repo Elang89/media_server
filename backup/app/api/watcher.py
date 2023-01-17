@@ -5,6 +5,8 @@ from loguru import logger
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileCreatedEvent
 from ffprobe import FFProbe
+from uuid import uuid4, UUID
+
 from app.aws.services.s3_service import S3Service
 from app.db.repositories.backup_repository import BackupRepository
 
@@ -13,12 +15,14 @@ from app.models.backup import Backup
 class Watcher(object):
 
     def __init__(
-        self, path: str, 
+        self,
+        id: UUID,  
+        path: str, 
         backup_repo: BackupRepository, 
         s3_service: S3Service, 
         actor_wait_time: float
     ) -> None:
-        
+        self._id = id
         self._observer: Observer = Observer()
         self._path = path
         self._backup_repo = backup_repo
@@ -28,6 +32,18 @@ class Watcher(object):
     @property
     def path(self) -> str:
         return self._path
+
+    @property
+    def backup_repo(self) -> BackupRepository:
+        return self._backup_repo
+
+    @property
+    def s3_service(self) -> S3Service:
+        return self._s3_service
+    
+    @property
+    def actor_wait_time(self) -> float: 
+        return self.actor_wait_time
 
 
     def run(self):
@@ -76,14 +92,14 @@ class Handler(FileSystemEventHandler):
             bitrate=metadata["bitrate"]
         )
         
-        logger.info(f"Watcher-{self.__hash__} backing up data into S3...")
+        logger.info(f"Watcher-{self.id} backing up data into S3...")
         self._s3_service.upload(file_path, folder, object_file)
         
         logger.info("{object_file} backed up into S3 bucket")
         
-        logger.info(f"Watcher-{self.__hash__} inserting reference data to mongo db...")
+        logger.info(f"Watcher-{self.id} inserting reference data to mongo db...")
         self._backup_repo.insert_one(backup)
 
-        logger.info(f"Watcher-{self.__hash__} inserted data into mongo db")
+        logger.info(f"Watcher-{self.id} inserted data into mongo db")
 
 

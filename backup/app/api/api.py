@@ -2,49 +2,33 @@ import boto3
 import os
 
 from pymongo.mongo_client import MongoClient
-from thespian.actors import Actor, ActorTypeDispatcher, ActorSystem
 
 from app.api.watcher import Watcher
-from app.api.producer import ActorProducer
+from app.api.producer import Producer
+from app.api.supervisor import Supervisor
 from app.db.repositories.backup_repository import BackupRepository
 from app.aws.services.s3_service import S3Service
 
-class ActorSupervisor(ActorTypeDispatcher):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-    
-    def createActor(self, 
-        actorClass: Actor,
-        watcher: Watcher, 
-        targetActorRequirements=None, 
-        globalName=None, 
-        sourceHash=None
-    ) -> Actor:
-        child = super().createActor(actorClass, targetActorRequirements, globalName, sourceHash)
-        self.send(child, watcher)
-
-        return child
-
-
-
-    def receiveMsg_ChildActorExited(message, sender):
-        pass
 
 def initialize() -> None:
     path = os.environ.get("ACTOR_WATCH_DIR")
-    wait_time = os.environ.get("ACTOR_WAIT_TIME")
+    wait_time = float(os.environ.get("ACTOR_WAIT_TIME"))
     subpaths = os.listdir(path)
-
-    supervisor = ActorSystem().createActor(ActorSupervisor)
-
+    producers = []
 
 
     for subpath in subpaths:
+        real_path = f"{path}/{subpath}"
         repo = init_mongo()
         s3 = init_s3()
-        watcher =  Watcher(subpath, repo, s3, wait_time)
-        supervisor.createActor(ActorProducer)
+        watcher =  Watcher(real_path, repo, s3, wait_time)
+        producer = Producer(watcher)
+        producers.append(producer)
+    
+    supervisor = Supervisor(producers)
+    supervisor.start_processes()
+        
 
 
 

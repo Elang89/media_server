@@ -1,12 +1,24 @@
-from thespian.actors import ActorTypeDispatcher
+from loguru import logger
+from multiprocessing import Process
+from uuid import uuid4
 from loguru import logger
 
 from app.api.watcher import Watcher
 
 
-class ActorProducer(ActorTypeDispatcher):
+class Producer(Process):
 
-    def receiveMessage(self, message, sender: ActorTypeDispatcher):
-        if isinstance(message, Watcher):
-            self._watcher = message.watcher
+    def __init__(self, watcher: Watcher) -> None:
+        self.id = uuid4()
+        self._watcher = watcher
+        super().__init__()
+
+    @property
+    def watcher(self) -> Watcher:
+        return self._watcher
+
+    def run(self) -> None:
+        try: 
             self._watcher.run()
+        except OSError as e: 
+            logger.error(f"Producer-{self.id} error: {e}")
