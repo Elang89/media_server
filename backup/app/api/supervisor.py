@@ -1,4 +1,5 @@
 from typing import List
+from loguru import logger
 
 from app.api.producer import Producer
 from app.api.watcher import Watcher
@@ -16,10 +17,14 @@ class Supervisor:
         while True:
             for producer in self._producers:
                 if not producer.is_alive():
+                    logger.info(f"Supervisor terminating Producer-{producer.id}")
+
                     new_producer = self._restart_process(producer)
                     self._producers.remove(producer)
                     self._producers.append(new_producer)
                     new_producer.start()
+
+                    logger.info(f"Supervisor replaced Producer-{producer.id} with Producer-{new_producer.id}")
 
                     producer.terminate()
                     producer.join()

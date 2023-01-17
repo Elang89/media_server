@@ -2,7 +2,6 @@ from pymongo.database import Collection
 from loguru import logger
 
 from app.models.backup import Backup
-from app.utils.sync import run_in_thread
 
 class BackupRepository(): 
 

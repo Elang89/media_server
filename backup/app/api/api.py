@@ -1,3 +1,4 @@
+from uuid import UUID
 import boto3
 import os
 
@@ -13,7 +14,6 @@ from app.aws.services.s3_service import S3Service
 
 def initialize() -> None:
     path = os.environ.get("ACTOR_WATCH_DIR")
-    wait_time = float(os.environ.get("ACTOR_WAIT_TIME"))
     subpaths = os.listdir(path)
     producers = []
 
@@ -22,7 +22,7 @@ def initialize() -> None:
         real_path = f"{path}/{subpath}"
         repo = init_mongo()
         s3 = init_s3()
-        watcher =  Watcher(real_path, repo, s3, wait_time)
+        watcher = init_watcher(real_path, repo, s3)
         producer = Producer(watcher)
         producers.append(producer)
     
@@ -62,7 +62,7 @@ def init_s3() -> S3Service:
     return s3_service
 
 def init_watcher(path: str, repo: BackupRepository, s3: S3Service) -> Watcher:
-    actor_wait_time = os.environ.get("ACTOR_WAIT_TIME")
+    actor_wait_time = float(os.environ.get("ACTOR_WAIT_TIME"))
     watcher = Watcher(path, repo, s3, actor_wait_time)
 
     return watcher

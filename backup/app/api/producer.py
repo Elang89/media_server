@@ -9,7 +9,7 @@ from app.api.watcher import Watcher
 class Producer(Process):
 
     def __init__(self, watcher: Watcher) -> None:
-        self.id = uuid4()
+        self.id = watcher._id
         self._watcher = watcher
         super().__init__()
 
