@@ -4,7 +4,6 @@ import time
 from loguru import logger
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileCreatedEvent
-from pymongo.database import Database
 from ffprobe import FFProbe
 from app.aws.services.s3_service import S3Service
 from app.db.repositories.backup_repository import BackupRepository
@@ -39,11 +38,10 @@ class Watcher(object):
         try:
             while True:
                 time.sleep(self._actor_wait_time)
-        except:
+                logger.info(f"Watcher will sleep for {self._actor_wait_time}s")
+        finally:
             self._observer.stop()
-            logger.error("Error")
-        
-        self._observer.join()
+            self._observer.join()
 
 class Handler(FileSystemEventHandler):
 
@@ -78,6 +76,14 @@ class Handler(FileSystemEventHandler):
             bitrate=metadata["bitrate"]
         )
         
+        logger.info(f"Watcher-{self.__hash__} backing up data into S3...")
         self._s3_service.upload(file_path, folder, object_file)
+        
+        logger.info("{object_file} backed up into S3 bucket")
+        
+        logger.info(f"Watcher-{self.__hash__} inserting reference data to mongo db...")
         self._backup_repo.insert_one(backup)
+
+        logger.info(f"Watcher-{self.__hash__} inserted data into mongo db")
+
 
