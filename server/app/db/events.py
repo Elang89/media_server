@@ -18,7 +18,8 @@ async def connect_to_db(app: FastAPI) -> None:
     )
 
     db_url = "mongodb://{user}:{password}@{host}".format(user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
-    database = await run_in_thread(MongoClient, db_url)
+    database = await run_in_thread(MongoClient, db_url, uuidRepresentation="standard")
+    database = database[DB_NAME]
 
     app.state.db = database
 

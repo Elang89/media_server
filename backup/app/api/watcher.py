@@ -91,6 +91,8 @@ class Handler(FileSystemEventHandler):
             start=metadata["start"],
             bitrate=metadata["bitrate"]
         )
+
+        logger.info(backup._id)
         
         logger.info(f"Watcher-{self._id} backing up data into S3...")
         self._s3_service.upload(file_path, folder, object_file)

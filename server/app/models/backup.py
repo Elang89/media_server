@@ -5,8 +5,15 @@ from pydantic import BaseModel
 
 class Backup(BaseModel):
     id: str
-    filepath: str
-    created_at: datetime
+    stream_id: str 
+    file_path: str
+    external_filepath: str
+    major_brand: str
+    compatible_brands: str
+    creation_time: str
+    duration: str
+    start: str
+    bitrate: str
 
 class BackupRequest(BaseModel):
     pass

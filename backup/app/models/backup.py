@@ -1,8 +1,8 @@
-import uuid
+from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
 
 class Backup(BaseModel):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    _id: UUID = Field(default_factory=uuid4)
     stream_id: str
     file_path: str
     external_filepath: str 

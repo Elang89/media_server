@@ -8,4 +8,4 @@ from app.resources.backup_constants import TAG_BACKUP
 router = APIRouter()
 
 router.include_router(video.router, tags=[TAG_VIDEO], prefix="/stream")
-router.include_router(backup.router, tags=[TAG_VIDEO], prefix="/backup")
+router.include_router(backup.router, tags=[TAG_BACKUP], prefix="/backup")

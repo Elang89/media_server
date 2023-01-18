@@ -5,7 +5,7 @@ from app.models.backup import Backup
 
 class BackupRepository(): 
 
-    def __init__(self, collection: Collection):
+    def __init__(self, collection: Collection) -> None:
         self._collection = collection
 
     def insert_one(self, backup: Backup) -> Backup:

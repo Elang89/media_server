@@ -1,6 +1,10 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, Body, Query, HTTPException
 from fastapi.responses import JSONResponse
+from starlette import status
+
+from app.db.repositories.backup_repository import BackupRepository
+from app.dependencies.database import get_repository
 
 from app.models.backup import BackupResponse, BackupListResponse
 from app.resources.backup_constants import (
@@ -48,11 +52,19 @@ async def get_backups(
     raise NotImplementedError
 
 @router.get(
-    "\{id}",
+    "/{id}",
     name="backup:get-one-backup",
     tags=[TAG_BACKUP],
     response_class=JSONResponse,
     response_model=BackupResponse
 )
-async def get_one_backup(id: str) -> BackupResponse:
-    raise NotImplementedError
+async def get_one_backup(
+    id: str, 
+    backup_repository: BackupRepository = Depends(get_repository(BackupRepository))
+) -> BackupResponse:
+    result  = await backup_repository.find_one_backup(id)
+
+    if result == None: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, )
+
+    return BackupResponse(backup=result)

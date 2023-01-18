@@ -8,3 +8,7 @@ QUERY_BACKUP_DEFAULT_OFFSET = 0
 # Query Filtering
 QUERY_BACKUP_SORT_REGEX = "(streamId|created_at|):(asc|desc)"
 QUERY_BACKUP_FILTER_REGEX = "placeholder"
+
+
+# Error 
+BACKUP_NOT_FOUND = "Backup specified was not found, specified id does not exist"
