@@ -1,17 +1,16 @@
-from uuid import UUID, uuid4
+from typing import Optional
 from pydantic import BaseModel, Field
+from bson import ObjectId
+from datetime import datetime
 
 class Backup(BaseModel):
-    _id: UUID = Field(default_factory=uuid4)
+    _id: Optional[ObjectId]
     stream_id: str
     file_path: str
     external_filepath: str 
-    major_brand: str
-    minor_version: str
-    compatible_brands: str
-    creation_time: str
-    duration: str
-    start: str 
-    bitrate: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    duration: Optional[str]
+    start: Optional[str] 
+    bitrate: Optional[str]
 
     

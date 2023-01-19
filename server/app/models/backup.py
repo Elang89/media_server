@@ -1,19 +1,18 @@
-from typing import List
+from typing import List, Optional
+from bson import ObjectId
+from pydantic import BaseModel
 from datetime import datetime
 
-from pydantic import BaseModel
 
 class Backup(BaseModel):
-    id: str
+    _id: ObjectId
     stream_id: str 
     file_path: str
     external_filepath: str
-    major_brand: str
-    compatible_brands: str
-    creation_time: str
-    duration: str
-    start: str
-    bitrate: str
+    created_at: datetime
+    duration: Optional[str]
+    start: Optional[str]
+    bitrate: Optional[str]
 
 class BackupRequest(BaseModel):
     pass

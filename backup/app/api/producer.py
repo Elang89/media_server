@@ -1,6 +1,5 @@
 from loguru import logger
 from multiprocessing import Process
-from uuid import uuid4
 from loguru import logger
 
 from app.api.watcher import Watcher

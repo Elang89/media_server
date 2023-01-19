@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  ant:
+    container_name: antmediaserver
+    restart: unless-stopped
+    image: antmediaserver:latest
+    networks:
+      cloud_manager:
+        ipv4_address: 172.23.0.2
+    volumes:
+      - ./streams:/usr/local/antmedia/webapps/WebRTCApp/streams
+    ports:
+      - 5080:5080
+
+  gstreamer:
+    container_name: gstreamer
+    restart: unless-stopped
+    image: gstreamer:latest
+    networks:
+      cloud_manager:
+        ipv4_address: 172.23.0.3
+    working_dir: /start
+    command: bash -c "sleep infinity"
+  
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    networks:
+      cloud_manager:
+        ipv4_address: 172.23.0.4 
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=admin 
+      - MONGO_INITDB_DATABASE=backup_db
+    ports:
+      - 27017:27017
+
+networks:
+  cloud_manager:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.23.0.0/24
+          gateway: 172.23.0.1
+

@@ -29,7 +29,7 @@ DB_USER: str = config("DB_USER", default="root")
 DB_PASSWORD: str = config("DB_PASSWORD", default="admin")
 DB_HOST: str = config("DB_HOST", default="localhost")
 DB_PORT: str = config("DB_HOST", default="27017")
-DB_NAME: str = config("DB_NAME", default="video_db")
+DB_NAME: str = config("DB_NAME", default="backup_db")
 
 # Logging Settings 
 

@@ -12,5 +12,5 @@ class BackupRepository():
         try: 
             self._collection.insert_one(backup.dict())
             return Backup
-        except:
-            logger.error("Error")
+        except Exception as e:
+            logger.error(e)

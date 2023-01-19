@@ -14,6 +14,8 @@ from app.aws.services.s3_service import S3Service
 
 def initialize() -> None:
     path = os.environ.get("ACTOR_WATCH_DIR")
+    print(path)
+
     subpaths = os.listdir(path)
     producers = []
 

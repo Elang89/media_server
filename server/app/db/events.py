@@ -18,16 +18,17 @@ async def connect_to_db(app: FastAPI) -> None:
     )
 
     db_url = "mongodb://{user}:{password}@{host}".format(user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
-    database = await run_in_thread(MongoClient, db_url, uuidRepresentation="standard")
-    database = database[DB_NAME]
+    client = await run_in_thread(MongoClient, db_url, uuidRepresentation="standard")
+    database = client[DB_NAME]
 
     app.state.db = database
+    app.state.client = client
 
     logger.info("Connection established.")
 
 async def close_db_connection(app: FastAPI) -> None:
     logger.info("Closing connection to database.")
 
-    await run_in_thread(app.state.db["__instance"].client.close)
+    await run_in_thread(app.state.client["__instance"].client.close)
 
     logger.info("Connection closed.")

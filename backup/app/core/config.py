@@ -22,7 +22,7 @@ def load_settings() -> None:
         check_settings("ACTOR_WAIT_TIME", 2.5)
     
     if not os.environ.get("ACTOR_WATCH_DIR"):
-        check_settings("ACTOR_WATCH_DIR", "../video")
+        check_settings("ACTOR_WATCH_DIR", "/streams")
 
     if not os.environ.get("S3_KEY_ID"):
         sys.exit("S3_KEY_ID must be set, this cannot be given a default value due to security issues.")

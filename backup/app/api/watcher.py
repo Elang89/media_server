@@ -6,6 +6,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileCreatedEvent
 from ffprobe import FFProbe
 from uuid import uuid4, UUID
+from datetime import datetime
 
 from app.aws.services.s3_service import S3Service
 from app.db.repositories.backup_repository import BackupRepository
@@ -71,37 +72,38 @@ class Handler(FileSystemEventHandler):
             return None
         
         file_path = event.src_path
-        logger.info(f"File created at {file_path}")
+        _, file_extension = os.path.splitext(file_path)
 
-        metadata = FFProbe(file_path)
-        metadata = metadata.metadata
-        folder = file_path.split("/")[-2]
+        if file_extension == ".ts" or file_extension == ".mp4":
+            logger.info(f"File created at {file_path}")
 
-        object_file = os.path.basename(file_path)
+            metadata = FFProbe(file_path)
+            metadata = metadata.metadata
+            folder = file_path.split("/")[-2]
 
-        backup = Backup(
-            stream_id="stream", 
-            file_path=file_path,
-            external_filepath=f"s3://amsvideo001/{folder}/{object_file}",
-            major_brand=metadata["major_brand"],
-            minor_version=metadata["minor_version"],
-            compatible_brands=metadata["compatible_brands"],
-            creation_time=metadata["creation_time"],
-            duration=metadata["Duration"],
-            start=metadata["start"],
-            bitrate=metadata["bitrate"]
-        )
+            object_file = os.path.basename(file_path)
 
-        logger.info(backup._id)
-        
-        logger.info(f"Watcher-{self._id} backing up data into S3...")
-        self._s3_service.upload(file_path, folder, object_file)
-        
-        logger.info(f"{object_file} backed up into S3 bucket")
-        
-        logger.info(f"Watcher-{self._id} inserting reference data to mongo db...")
-        self._backup_repo.insert_one(backup)
+            duration = metadata.get("Duration") if metadata.get("Duration") else None
+            start = metadata.get("start") if metadata.get("start") else None
+            bitrate = metadata.get("bitrate") if metadata.get("bitrate") else None
 
-        logger.info(f"Watcher-{self._id} inserted data into mongo db")
+            backup = Backup(
+                stream_id="stream", 
+                file_path=file_path,
+                external_filepath=f"s3://amsvideo001/{folder}/{object_file}",
+                duration=duration,
+                start=start,
+                bitrate=bitrate
+            )
+            
+            logger.info(f"Watcher-{self._id} backing up data into S3...")
+            self._s3_service.upload(file_path, folder, object_file)
+            
+            logger.info(f"{object_file} backed up into S3 bucket")
+            
+            logger.info(f"Watcher-{self._id} inserting reference data to mongo db...")
+            self._backup_repo.insert_one(backup)
+
+            logger.info(f"Watcher-{self._id} inserted data into mongo db")
 
 

@@ -36,7 +36,7 @@ async def get_backups(
         alias="offset",
         description="Pagination offset"
     ),
-    sort: Optional[List[str]] = Query(
+    sort_params: Optional[List[str]] = Query(
         None,
         alias="sort",
         description="Sorting for collection",
@@ -47,9 +47,27 @@ async def get_backups(
         alias="filters",
         description="Filters for collection",
         regex=QUERY_BACKUP_FILTER_REGEX
+    ),
+    backup_repository: BackupRepository = Depends(
+        get_repository(BackupRepository)
     )
 ) -> BackupListResponse:
-    raise NotImplementedError
+        import pdb
+
+        pdb.set_trace()
+
+        
+        if sort_params:
+            sort_param_list = [sort_param.split(":") for sort_param in sort_params]
+            sort_params = {sort_param[0]: sort_param[1] for sort_param in sort_param_list}
+
+        if filters:
+            filter_param_list = [filter_param.split(":") for filter_param in filters]
+            filters = {filter_param[0]: filter_param[1] for filter_param in filter_param_list}
+
+        backups = backup_repository.find_all(offset, limit, sort_params, filters)
+
+        return BackupListResponse(backups=backups)
 
 @router.get(
     "/{id}",

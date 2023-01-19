@@ -182,3 +182,5 @@ dmypy.json
 # tmp 
 tmp
 *.zip
+
+streams
