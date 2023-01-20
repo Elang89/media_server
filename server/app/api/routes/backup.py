@@ -52,9 +52,6 @@ async def get_backups(
         get_repository(BackupRepository)
     )
 ) -> BackupListResponse:
-        import pdb
-
-        pdb.set_trace()
 
         
         if sort_params:
