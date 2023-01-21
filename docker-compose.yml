@@ -90,6 +90,8 @@ services:
       - 3000:3000
     depends_on:
       - logstash
+    volumes:
+      - grafana-data:/var/lib/grafana
 
   ant:
     container_name: antmediaserver
@@ -100,6 +102,7 @@ services:
         ipv4_address: 172.23.0.2
     volumes:
       - ./streams:/usr/local/antmedia/webapps/WebRTCApp/streams
+      - ant-data:/usr/local/antmedia
     ports:
       - 5080:5080
     depends_on:
@@ -127,6 +130,8 @@ services:
       - MONGO_INITDB_DATABASE=backup_db
     ports:
       - 27017:27017
+    volumes:
+      - mongo-data:/data/db
   
   server:
     container_name: server
@@ -152,4 +157,7 @@ networks:
 
 volumes:
   elasticsearch-data:
+  mongo-data:
+  ant-data:
+  grafana-data:  
 
