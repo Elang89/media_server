@@ -2,32 +2,6 @@ version: "3.8"
 
 services:
 
-  logstash: 
-    container_name: logstash
-    restart: unless-stopped
-    image: logstash:latest
-    networks:
-      cloud_manager:
-        ipv4_address: 172.23.0.8
-
-  elasticsearch:
-    container_name: elasticsearch
-    restart: unless-stopped
-    image: elasticsearch:latest
-    networks:
-      cloud_manager: 
-        ipv4_address: 172.23.0.9
-
-  graphana:
-    container_name: graphana
-    restart: unless-stopped
-    image: graphana-oss:latest
-    networks:
-      cloud_manager:
-        ipv4_address: 172.23.0.10
-    ports:
-      - 3000:3000
-
   zookeeper:
     container_name: zookeeper
     restart: unless-stopped
@@ -54,8 +28,8 @@ services:
     environment:
       - KAFKA_BROKER_ID=0 
       - KAFKA_ZOOKEEPER_CONNECT=172.23.0.5:2181 
-      - KAFKA_LISTENERS=LISTENER_DOCKER://kafka:29092,LISTENER_HOST://172.23.0.7:9092 
-      - KAFKA_ADVERTISED_LISTENERS=LISTENER_DOCKER://kafka:29092,LISTENER_HOST://172.23.0.7:9092 
+      - KAFKA_LISTENERS=LISTENER_DOCKER://172.23.0.7:29092,LISTENER_HOST://172.23.0.7:9092 
+      - KAFKA_ADVERTISED_LISTENERS=LISTENER_DOCKER://172.23.0.7:29092,LISTENER_HOST://172.23.0.7:9092 
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=LISTENER_DOCKER:PLAINTEXT,LISTENER_HOST:PLAINTEXT 
       - KAFKA_INTER_BROKER_LISTENER_NAME=LISTENER_DOCKER 
       - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=100 
@@ -66,6 +40,56 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - zookeeper 
+  
+  elasticsearch:
+    container_name: elasticsearch
+    restart: unless-stopped
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.8
+    networks:
+      cloud_manager: 
+        ipv4_address: 172.23.0.9
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+  logstash: 
+    container_name: logstash
+    restart: unless-stopped
+    image: docker.elastic.co/logstash/logstash:7.17.8
+    networks:
+      cloud_manager:
+        ipv4_address: 172.23.0.8
+    volumes:
+      - ./.docker/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    depends_on:
+      - kafka
+      - elasticsearch
+
+  grafana:
+    container_name: grafana
+    restart: unless-stopped
+    image: grafana/grafana-oss:latest
+    networks:
+      cloud_manager:
+        ipv4_address: 172.23.0.10
+    ports:
+      - 3000:3000
+    depends_on:
+      - logstash
 
   ant:
     container_name: antmediaserver
@@ -113,4 +137,7 @@ networks:
       config:
         - subnet: 172.23.0.0/24
           gateway: 172.23.0.1
+
+volumes:
+  elasticsearch-data:
 
