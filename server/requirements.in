@@ -1,10 +1,10 @@
 fastapi
 loguru
-python-dateutil
 docker
 uvicorn
 pymongo
 python-dotenv
+pydantic
 black
 httpx
 flake8

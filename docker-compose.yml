@@ -128,6 +128,18 @@ services:
     ports:
       - 27017:27017
   
+  server:
+    container_name: server
+    image: server:latest
+    networks: 
+      cloud_manager:
+        ipv4_address: 172.23.0.11
+    ports:
+      - 5000:5000
+    depends_on: 
+      - ant
+      - mongo
+  
 
 networks:
   cloud_manager:
