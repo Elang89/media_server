@@ -97,4 +97,4 @@ def stream_request(random_generator: Random, internet: Internet) -> VideoStreamR
 
 def generate_url(type: str) -> str:
     random_generator = Random()
-    return f"{type}://{random_generator.randstr()}.{random_generator.randstr()}.com//{random_generator.randstr()}"
+    return f"{type}://{random_generator.randstr()}.{random_generator.randstr()}.com/{random_generator.randstr()}"
